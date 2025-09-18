@@ -26,7 +26,7 @@ const stats = {
 };
 
 // Bad words filter (basic implementation)
-const badWords = ['spam', 'scam', 'porn', 'xxx', 'sex', 'nude', 'drugs'];
+const badWords = ['spam', 'scam', 'horny', 'boobs', 'child porn', 'dick', 'pussy', 'coli', 'snge', 'porn', 'xxx', 'sex', 'nude', 'drugs'];
 
 function containsBadWords(text) {
     if (!text) return false;
@@ -105,7 +105,7 @@ bot.onText(/\/start/, (msg) => {
     
     getUser(userId); // Initialize user
     
-    const welcomeMessage = `👋 Welcome to StrangerTalk Bot!
+    const welcomeMessage = `👋 Hi buddy , welcome !
 Stay anonymous, safe & have fun.
 
 👉 Tap /chat to find a stranger to talk with!`;
