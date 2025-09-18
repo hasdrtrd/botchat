@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: telegram-chat-bot
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+      - key: CHANNEL_LINK
+        value: https://t.me/yourchannel
+      - key: GROUP_LINK
+        value: https://t.me/yourgroup
+    healthCheckPath: /health

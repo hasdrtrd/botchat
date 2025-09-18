@@ -1,0 +1,12 @@
+# Telegram Bot Token - Get from @BotFather
+BOT_TOKEN=your_bot_token_here
+
+# Admin User IDs (comma separated) - Get your ID from @userinfobot
+ADMIN_IDS=123456789,987654321
+
+# Channel and Group Links
+CHANNEL_LINK=https://t.me/yourchannel
+GROUP_LINK=https://t.me/yourgroup
+
+# Port for Express server (Render will set this automatically)
+PORT=3000
