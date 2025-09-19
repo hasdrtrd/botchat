@@ -311,7 +311,7 @@ Choose your support level:`;
     };
 
     bot.sendMessage(chatId, supportMessage, options);
-});
+);
 
 bot.onText(/\/safemode/, (msg) => {
     const chatId = msg.chat.id;
