@@ -285,10 +285,9 @@ Thank you for supporting StrangerTalk Bot! 💖
 
 Want to support more? Use /support`;
 
-    bot.sendMessage(chatId, statusMessage);
-});
+    bot.onText(/\/support/, (msg) => {
     const chatId = msg.chat.id;
-    
+
     const supportMessage = `💝 Support Our Bot!
 
 Your donations help us keep this service free and improve features!
@@ -311,8 +310,8 @@ Choose your support level:`;
     };
 
     bot.sendMessage(chatId, supportMessage, options);
-);
-
+});
+    
 bot.onText(/\/safemode/, (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
