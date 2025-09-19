@@ -157,7 +157,7 @@ bot.onText(/\/start/, (msg) => {
     
     const user = getUser(userId); // Initialize user
     
-    let welcomeMessage = `👋 Welcome to StrangerTalk Bot!
+    let welcomeMessage = `👋 Welcome to randombudddyBot!
 Stay anonymous, safe & have fun.
 
 👉 Tap /chat to find a stranger to talk with!`;
