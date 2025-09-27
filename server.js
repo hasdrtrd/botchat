@@ -158,11 +158,6 @@ function endChat(userId) {
     if (partnerId) {
         activeChats.delete(userId);
         activeChats.delete(partnerId);
-
-        // No buttons on disconnect messages
-        bot.sendMessage(userId, "❌ You have left the chat.");
-        bot.sendMessage(partnerId, "❌ Your partner has left the chat. Type /search to find a new one.");
-
         return partnerId;
     }
     return null;
@@ -242,16 +237,15 @@ bot.onText(/\/stop/, (msg) => {
     const partnerId = endChat(userId);
     
     if (partnerId) {
-        bot.sendMessage(chatId, '❌ Chat ended. Use /chat to start a new conversation!');
-        bot.sendMessage(partnerId, '❌ Your partner left the chat. Use /chat to find a new partner!');
+        bot.sendMessage(chatId, 'âŒ Chat ended. Use /chat to start a new conversation!');
+        bot.sendMessage(partnerId, 'âŒ Your partner left the chat. Use /chat to find a new partner!');
     } else {
-        bot.sendMessage(chatId, '❌ You are not in a chat currently.');
+        bot.sendMessage(chatId, 'âŒ You are not in a chat currently.');
     }
     
     // Remove from waiting queue if present
     waitingQueue.delete(userId);
 });
-
 // Products configuration
 const products = {
     basic: {
