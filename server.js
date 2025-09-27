@@ -875,14 +875,7 @@ Want to support more? Use /buy`;
         }
     }
 });
-    // --- Trigger /buy command manually ---
-if (data === "buy_command") {
-    bot.answerCallbackQuery(query.id);
-    // simulate the user typing /buy
-    bot.emit('text', { chat: { id: chatId }, text: '/buy' });
-}
-});
-
+    
 // Pre-checkout query handler
 bot.on('pre_checkout_query', (query) => {
     const validPayloads = Object.values(products).map(p => p.payload);
