@@ -788,6 +788,51 @@ bot.on('callback_query', (query) => {
 
     bot.answerCallbackQuery(query.id); // always answer
 
+    // --- Handle /buy button click ---
+    if (data === '/buy') {
+        // Trigger the same logic as /buy command
+        const keyboard = {
+            inline_keyboard: [
+                [
+                    { text: `⭐ ${products.basic.title} - ${products.basic.price} stars`, callback_data: 'buy_basic' }
+                ],
+                [
+                    { text: `⭐ ${products.premium.title} - ${products.premium.price} stars`, callback_data: 'buy_premium' }
+                ],
+                [
+                    { text: `⭐ ${products.vip.title} - ${products.vip.price} stars`, callback_data: 'buy_vip' }
+                ]
+            ]
+        };
+
+        bot.sendMessage(chatId, 'select a amount to donate:', {
+            reply_markup: keyboard
+        });
+
+        // Show supporter status if user is a supporter
+        const user = getUser(userId);
+        if (user.supporter && user.supportAmount > 0) {
+            const supportDate = new Date(user.lastSupport).toLocaleDateString();
+            const statusMessage = `👑 Your Premium Status
+
+✅ **Active Supporter**
+⭐ Total Support: ${user.supportAmount} Stars
+📅 Last Support: ${supportDate}
+
+🎯 **Your Benefits:**
+• ⚡ Priority matching (active)
+• 👑 Supporter badge (active)  
+• 🤝 Supporter-to-supporter matching (active)
+
+Thank you for supporting ! 💖
+
+Want to support more? Use /buy`;
+
+            bot.sendMessage(chatId, statusMessage);
+        }
+        return;
+    }
+
     // --- Safe Mode toggle ---
     if (data === 'toggle_safe_mode') {
         const user = getUser(userId);
@@ -829,6 +874,7 @@ bot.on('callback_query', (query) => {
             );
         }
     }
+});
     // --- Trigger /buy command manually ---
 if (data === "buy_command") {
     bot.answerCallbackQuery(query.id);
