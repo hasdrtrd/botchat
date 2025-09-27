@@ -257,7 +257,7 @@ const products = {
 };
 
 // Buy command with product selection
-bot.onText(/\/support/, (msg) => {
+bot.onText(/\/buy/, (msg) => {
     const chatId = msg.chat.id;
 
     const keyboard = {
@@ -298,7 +298,7 @@ Want to support more? Use /support`;
     bot.sendMessage(chatId, statusMessage);
 });
 
-//bot.onText(/\/support/, (msg) => {
+bot.onText(/\/support/, (msg) => {
     const chatId = msg.chat.id;
     
     const supportMessage = `💝 Support Our Bot!
