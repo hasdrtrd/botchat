@@ -139,11 +139,11 @@ function startChat(user1Id, user2Id) {
     };
 
     if (user1.supporter && !user2.supporter) {
-        bot.sendMessage(user1Id, '💬⭐ Connected! As a supporter, you get priority matching. Chat away!', buttons);
+        bot.sendMessage(user1Id, '💬⭐ Connected to supporter, tap /end to end the chat'', buttons);
         bot.sendMessage(user2Id, connectMessage, buttons);
         return;
     } else if (user2.supporter && !user1.supporter) {
-        bot.sendMessage(user2Id, '💬⭐ Connected! As a supporter, you get priority matching. Chat away!', buttons);
+        bot.sendMessage(user2Id, '💬⭐ Connected to supporter, tap /end to end the chat', buttons);
         bot.sendMessage(user1Id, connectMessage, buttons);
         return;
     }
@@ -237,10 +237,10 @@ bot.onText(/\/stop/, (msg) => {
     const partnerId = endChat(userId);
     
     if (partnerId) {
-        bot.sendMessage(chatId, 'âŒ Chat ended. Use /chat to start a new conversation!');
-        bot.sendMessage(partnerId, 'âŒ Your partner left the chat. Use /chat to find a new partner!');
+        bot.sendMessage(chatId, 'Chat ended. Use /chat to start a new chat');
+        bot.sendMessage(partnerId, 'Your partner left the chat. Use /chat to find a new chat');
     } else {
-        bot.sendMessage(chatId, 'âŒ You are not in a chat currently.');
+        bot.sendMessage(chatId, 'You are not in a chat currently, tap /chat to chat.');
     }
     
     // Remove from waiting queue if present
