@@ -867,8 +867,6 @@ bot.on('successful_payment', (msg) => {
     });
 });
 
-const fetch = require("node-fetch"); // make sure node-fetch is installed
-
 // Refund command (only for admins)
 bot.onText(/\/refund (\d+) ([\w-]+)/, async (msg, match) => {
     const adminId = msg.from.id;
@@ -880,7 +878,7 @@ bot.onText(/\/refund (\d+) ([\w-]+)/, async (msg, match) => {
     const chargeId = match[2];
 
     try {
-        const res = await fetch(`https://api.telegram.org/bot${TOKEN}/refundStarPayment`, {
+        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/refundStarPayment`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
