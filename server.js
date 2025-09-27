@@ -234,39 +234,50 @@ bot.onText(/\/stop/, (msg) => {
     waitingQueue.delete(userId);
 });
 
-bot.onText(/\/premium/, (msg) => {
-    const chatId = msg.chat.id;
-    const userId = msg.from.id;
-    
-    const user = getUser(userId);
-    
-    if (!user.supporter || user.supportAmount === 0) {
-        const premiumInfo = `🌟 Premium Features
-
-Support our bot and unlock premium benefits:
-
-⚡ **Priority Matching**
-• Get matched faster than regular users
-• Skip to front of waiting queue
-
-👑 **Supporter Badge**  
-• Special welcome messages
-• Recognition in chats
-
-🤝 **Supporter-to-Supporter**
-• Higher chance to chat with other supporters
-• Premium community experience
-
-💫 **Future Features**
-• Custom themes (coming soon)
-• Extended chat history (coming soon)  
-• Special emojis (coming soon)
-
-Ready to upgrade? Use /support to donate with Telegram Stars!`;
-
-        bot.sendMessage(chatId, premiumInfo);
-        return;
+// Products configuration
+const products = {
+    basic: {
+        title: 'Базовый товар',
+        description: 'Описание базового товара',
+        price: 5,
+        payload: 'basic-product'
+    },
+    premium: {
+        title: 'Премиум товар',
+        description: 'Описание премиум товара',
+        price: 15,
+        payload: 'premium-product'
+    },
+    vip: {
+        title: 'VIP товар',
+        description: 'Описание VIP товара',
+        price: 50,
+        payload: 'vip-product'
     }
+};
+
+// Buy command with product selection
+bot.onText(/\/buy/, (msg) => {
+    const chatId = msg.chat.id;
+
+    const keyboard = {
+        inline_keyboard: [
+            [
+                { text: `⭐ ${products.basic.title} - ${products.basic.price} звезд`, callback_data: 'buy_basic' }
+            ],
+            [
+                { text: `⭐ ${products.premium.title} - ${products.premium.price} звезд`, callback_data: 'buy_premium' }
+            ],
+            [
+                { text: `⭐ ${products.vip.title} - ${products.vip.price} звезд`, callback_data: 'buy_vip' }
+            ]
+        ]
+    };
+
+    bot.sendMessage(chatId, 'Выберите товар для покупки:', {
+        reply_markup: keyboard
+    });
+});
     
     // Show supporter status
     const supportDate = new Date(user.lastSupport).toLocaleDateString();
@@ -780,94 +791,70 @@ bot.on('callback_query', (query) => {
         });
     }
     
-    // Handle Stars payment buttons
-    if (data.startsWith('buy_stars_')) {
-        const amount = data.split('_')[2]; // Extract amount (10, 50, 100, 500)
-        const starsAmount = parseInt(amount);
-        
-        let title, description;
-        
-        switch(starsAmount) {
-            case 10:
-                title = "Small Support ⭐";
-                description = "Thank you for supporting our bot with 10 Stars!";
-                break;
-            case 50:
-                title = "Medium Support ⭐⭐";
-                description = "Amazing support! 50 Stars helps us grow!";
-                break;
-            case 100:
-                title = "Big Support ⭐⭐⭐";
-                description = "Wow! 100 Stars makes a huge difference!";
-                break;
-            case 500:
-                title = "Premium Support ⭐⭐⭐⭐";
-                description = "Incredible! 500 Stars - you're a true supporter!";
-                break;
-        }
-        
-        try {
-            bot.sendInvoice(chatId, {
-                title: title,
-                description: description,
-                payload: `stars_donation_${starsAmount}_${userId}`,
-                provider_token: "", // Empty for Telegram Stars
-                currency: "XTR", // Telegram Stars currency
-                prices: [{ 
-                    label: `${starsAmount} Stars`, 
-                    amount: starsAmount 
-                }]
-            });
-            
-            bot.answerCallbackQuery(query.id, `💫 Invoice sent for ${starsAmount} Stars!`);
-        } catch (error) {
-            console.error('Error sending invoice:', error);
-            bot.answerCallbackQuery(query.id, "❌ Payment temporarily unavailable");
-            bot.sendMessage(chatId, "❌ Sorry, Telegram Stars payments are temporarily unavailable. Please try again later.");
+  // Handle product selection
+bot.on('callback_query', (callbackQuery) => {
+    const chatId = callbackQuery.message.chat.id;
+    const data = callbackQuery.data;
+
+    // Answer callback query to remove loading state
+    bot.answerCallbackQuery(callbackQuery.id);
+
+    if (data.startsWith('buy_')) {
+        const productKey = data.replace('buy_', '');
+        const product = products[productKey];
+
+        if (product) {
+            const prices = [{
+                label: product.title,
+                amount: product.price // For XTR, amount is in stars (not cents)
+            }];
+
+            bot.sendInvoice(
+                chatId,
+                product.title,
+                product.description,
+                product.payload,
+                '', // provider_token (empty for digital goods)
+                'XTR', // currency
+                prices,
+                {
+                    start_parameter: 'start_parameter'
+                }
+            );
         }
     }
 });
 
-// Handle pre-checkout query (payment validation)
-bot.on('pre_checkout_query', (ctx) => {
-    try {
-        // Always approve the payment
-        ctx.answerPreCheckoutQuery(true);
-        
-        // Log payment attempt
-        console.log(`Pre-checkout: ${ctx.preCheckoutQuery.from.username} - ${ctx.preCheckoutQuery.total_amount} Stars`);
-    } catch (error) {
-        console.error('Pre-checkout error:', error);
-        ctx.answerPreCheckoutQuery(false, "Payment processing error");
+// Pre-checkout query handler
+bot.on('pre_checkout_query', (query) => {
+    // Check if payload matches any of our products
+    const validPayloads = Object.values(products).map(p => p.payload);
+
+    if (!validPayloads.includes(query.invoice_payload)) {
+        bot.answerPreCheckoutQuery(query.id, false, {
+            error_message: 'Что-то пошло не так...'
+        });
+    } else {
+        bot.answerPreCheckoutQuery(query.id, true);
     }
 });
 
-// Handle successful payment
-bot.on('successful_payment', (ctx) => {
-    const payment = ctx.message.successful_payment;
-    const userId = ctx.from.id;
-    const username = ctx.from.username || 'Unknown';
-    const amount = payment.total_amount;
-    const payload = payment.invoice_payload;
-    
-    // Log successful payment
-    console.log(`Payment received: ${username} (${userId}) paid ${amount} Stars`);
-    
-    // Thank the user
-    const thankYouMessage = `🎉 Payment Successful!
+// Successful payment handler
+bot.on('successful_payment', (msg) => {
+    const payment = msg.successful_payment;                                                         const telegramPaymentChargeId = payment.telegram_payment_charge_id;
+    const chatId = msg.chat.id;
 
-Thank you for your generous support of ${amount} Stars! ⭐
+    // Find which product was purchased
+    const purchasedProduct = Object.values(products).find(p => p.payload === payment.invoice_pa>
+    const productName = purchasedProduct ? purchasedProduct.title : 'товар';
 
-Your contribution helps us:
-• Keep the bot running 24/7
-• Add new features
-• Maintain a safe community
-• Provide free service to everyone
-
-You're amazing! 💖`;
-
-    ctx.reply(thankYouMessage);
-    
+    bot.sendMessage(chatId,
+        `✅ Платеж успешно выполнен!\n` +
+        `Товар: ${productName}\n` +
+        `Цена: ${payment.total_amount} ⭐\n` +
+        `ID транзакции: ${telegramPaymentChargeId}`
+    );
+});
     // Notify admins about the payment
     ADMIN_IDS.forEach(adminId => {
         try {
