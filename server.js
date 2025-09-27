@@ -763,19 +763,22 @@ bot.on('message', (msg) => {
     }
 });
 
-// Handle callback queries (inline button clicks)
+// Handle all callback queries (inline button clicks)
 bot.on('callback_query', (query) => {
     const userId = query.from.id;
     const data = query.data;
     const chatId = query.message.chat.id;
-    
+
+    // Always answer callback to remove loading state
+    bot.answerCallbackQuery(query.id);
+
+    // --- Safe Mode toggle ---
     if (data === 'toggle_safe_mode') {
         const user = getUser(userId);
         user.safeMode = !user.safeMode;
-        
+
         const status = user.safeMode ? 'ON' : 'OFF';
-        bot.answerCallbackQuery(query.id, `Safe Mode: ${status}`);
-        
+
         const options = {
             reply_markup: {
                 inline_keyboard: [
@@ -783,22 +786,17 @@ bot.on('callback_query', (query) => {
                 ]
             }
         };
-        
+
         bot.editMessageText(`🔒 Safe Mode is now ${status}`, {
-            chat_id: query.message.chat.id,
+            chat_id: chatId,
             message_id: query.message.message_id,
             reply_markup: options.reply_markup
         });
+
+        return; // stop here so it doesn’t also check buy_*
     }
-    
-  // Handle product selection
-bot.on('callback_query', (callbackQuery) => {
-    const chatId = callbackQuery.message.chat.id;
-    const data = callbackQuery.data;
 
-    // Answer callback query to remove loading state
-    bot.answerCallbackQuery(callbackQuery.id);
-
+    // --- Handle product purchases ---
     if (data.startsWith('buy_')) {
         const productKey = data.replace('buy_', '');
         const product = products[productKey];
@@ -806,7 +804,7 @@ bot.on('callback_query', (callbackQuery) => {
         if (product) {
             const prices = [{
                 label: product.title,
-                amount: product.price // For XTR, amount is in stars (not cents)
+                amount: product.price * 100 // Stars use smallest units
             }];
 
             bot.sendInvoice(
@@ -814,12 +812,10 @@ bot.on('callback_query', (callbackQuery) => {
                 product.title,
                 product.description,
                 product.payload,
-                '', // provider_token (empty for digital goods)
-                'XTR', // currency
+                '', // provider_token (empty for Stars)
+                'XTR', // Telegram Stars
                 prices,
-                {
-                    start_parameter: 'start_parameter'
-                }
+                { start_parameter: 'start_parameter' }
             );
         }
     }
@@ -827,7 +823,6 @@ bot.on('callback_query', (callbackQuery) => {
 
 // Pre-checkout query handler
 bot.on('pre_checkout_query', (query) => {
-    // Check if payload matches any of our products
     const validPayloads = Object.values(products).map(p => p.payload);
 
     if (!validPayloads.includes(query.invoice_payload)) {
@@ -841,8 +836,27 @@ bot.on('pre_checkout_query', (query) => {
 
 // Successful payment handler
 bot.on('successful_payment', (msg) => {
-    const payment = msg.successful_payment;                                                         const telegramPaymentChargeId = payment.telegram_payment_charge_id;
+    const payment = msg.successful_payment;
     const chatId = msg.chat.id;
+    const userId = msg.from.id;
+
+    const purchasedProduct = Object.values(products).find(p => p.payload === payment.invoice_payload);
+    const productName = purchasedProduct ? purchasedProduct.title : 'товар';
+
+    bot.sendMessage(
+        chatId,
+        `✅ Платеж успешно выполнен!\n` +
+        `Товар: ${productName}\n` +
+        `Цена: ${payment.total_amount} ⭐\n` +
+        `ID транзакции: ${payment.telegram_payment_charge_id}`
+    );
+
+    // Mark user as supporter
+    const user = getUser(userId);
+    user.supporter = true;
+    user.supportAmount += payment.total_amount;
+    user.lastSupport = new Date();
+});
 
     // Find which product was purchased
     const purchasedProduct = Object.values(products).find(p => p.payload === payment.invoice_pa>
