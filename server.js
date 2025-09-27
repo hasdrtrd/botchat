@@ -838,50 +838,48 @@ bot.on('successful_payment', (msg) => {
     const payment = msg.successful_payment;
     const chatId = msg.chat.id;
     const userId = msg.from.id;
+    const username = msg.from.username || "Unknown";
 
-    const purchasedProduct = Object.values(products).find(p => p.payload === payment.invoice_payload);
+    // Find which product was purchased
+    const purchasedProduct = Object.values(products).find(
+        p => p.payload === payment.invoice_payload
+    );
     const productName = purchasedProduct ? purchasedProduct.title : 'товар';
+    const amount = payment.total_amount;
+    const telegramPaymentChargeId = payment.telegram_payment_charge_id;
 
+    // Confirm to user
     bot.sendMessage(
         chatId,
         `✅ Платеж успешно выполнен!\n` +
         `Товар: ${productName}\n` +
-        `Цена: ${payment.total_amount} ⭐\n` +
-        `ID транзакции: ${payment.telegram_payment_charge_id}`
+        `Цена: ${amount} ⭐\n` +
+        `ID транзакции: ${telegramPaymentChargeId}`
     );
 
     // Mark user as supporter
     const user = getUser(userId);
     user.supporter = true;
-    user.supportAmount += payment.total_amount;
+    user.supportAmount += amount;
     user.lastSupport = new Date();
-});
 
-    // Find which product was purchased
-    const purchasedProduct = Object.values(products).find(p => p.payload === payment.invoice_pa>
-    const productName = purchasedProduct ? purchasedProduct.title : 'товар';
-
-    bot.sendMessage(chatId,
-        `✅ Платеж успешно выполнен!\n` +
-        `Товар: ${productName}\n` +
-        `Цена: ${payment.total_amount} ⭐\n` +
-        `ID транзакции: ${telegramPaymentChargeId}`
-    );
-});
-    // Notify admins about the payment
+    // Notify admins
     ADMIN_IDS.forEach(adminId => {
         try {
-            bot.sendMessage(adminId, `💰 Payment Received!
-            
-User: @${username} (ID: ${userId})
-Amount: ${amount} Stars ⭐
-Time: ${new Date().toLocaleString()}
-
-Total supporters growing! 🚀`);
-        } catch (error) {
-            console.error('Error notifying admin:', error);
+            bot.sendMessage(
+                adminId,
+                `💰 Payment Received!\n\n` +
+                `👤 User: @${username} (ID: ${userId})\n` +
+                `📦 Product: ${productName}\n` +
+                `💵 Amount: ${amount} ⭐\n` +
+                `🆔 Transaction ID: ${telegramPaymentChargeId}\n` +
+                `⏰ Time: ${new Date().toLocaleString()}`
+            );
+        } catch (err) {
+            console.error(`Failed to notify admin ${adminId}:`, err);
         }
     });
+});
     
     // Optional: Grant premium features or special status
     const user = getUser(userId);
