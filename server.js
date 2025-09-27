@@ -867,6 +867,40 @@ bot.on('successful_payment', (msg) => {
     });
 });
 
+const fetch = require("node-fetch"); // make sure node-fetch is installed
+
+// Refund command (only for admins)
+bot.onText(/\/refund (\d+) ([\w-]+)/, async (msg, match) => {
+    const adminId = msg.from.id;
+    if (!ADMIN_IDS.includes(adminId)) {
+        return bot.sendMessage(msg.chat.id, "❌ You are not authorized to use this command.");
+    }
+
+    const userId = parseInt(match[1]);
+    const chargeId = match[2];
+
+    try {
+        const res = await fetch(`https://api.telegram.org/bot${TOKEN}/refundStarPayment`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id: userId,
+                telegram_payment_charge_id: chargeId
+            })
+        });
+        const data = await res.json();
+
+        if (data.ok && data.result === true) {
+            bot.sendMessage(msg.chat.id, `✅ Refund successful for user ${userId}\nTransaction: ${chargeId}`);
+            bot.sendMessage(userId, `🔁 Your payment (ID: ${chargeId}) has been refunded.`);
+        } else {
+            bot.sendMessage(msg.chat.id, `❌ Refund failed: ${JSON.stringify(data)}`);
+        }
+    } catch (err) {
+        console.error("Refund error:", err);
+        bot.sendMessage(msg.chat.id, `⚠️ Error: ${err.message}`);
+    }
+});
 // Express server for health checks (required for Render)
 app.use(express.static('public'));
 
