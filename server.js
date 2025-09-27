@@ -166,7 +166,7 @@ Stay anonymous, safe & have fun.
     if (user.supporter && user.supportAmount > 0) {
         welcomeMessage += `\n\n⭐ Welcome back, supporter! Thanks for your ${user.supportAmount} Stars donation. You get priority matching!`;
     } else {
-        welcomeMessage += `\n\n💝 Like our bot? Support us with /support and get premium features!`;
+        welcomeMessage += `\n\n💝 Like our bot? Support us with /buy and buy some crazy virtual food!`;
     }
 
     const options = {
@@ -191,7 +191,7 @@ bot.onText(/\/chat/, (msg) => {
     
     // Check if user is already in a chat
     if (activeChats.has(userId)) {
-        bot.sendMessage(chatId, '💬 You are already in a chat! Use /stop to end current chat first.');
+        bot.sendMessage(chatId, '💬 You are already in a chat! Use /stop to end current chat.');
         return;
     }
     
@@ -237,20 +237,20 @@ bot.onText(/\/stop/, (msg) => {
 // Products configuration
 const products = {
     basic: {
-        title: 'Базовый товар',
-        description: 'Описание базового товара',
+        title: 'Delicious icecream 🍧',
+        description: 'Description of the base product',
         price: 5,
         payload: 'basic-product'
     },
     premium: {
-        title: 'Премиум товар',
-        description: 'Описание премиум товара',
+        title: 'Golden burger 🍔',
+        description: 'Description of the premium product',
         price: 15,
         payload: 'premium-product'
     },
     vip: {
-        title: 'VIP товар',
-        description: 'Описание VIP товара',
+        title: 'Secret tacostar',
+        description: 'Description of the Vip product',
         price: 50,
         payload: 'vip-product'
     }
