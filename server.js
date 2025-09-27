@@ -886,7 +886,6 @@ bot.on('successful_payment', (msg) => {
     user.supporter = true;
     user.supportAmount = (user.supportAmount || 0) + amount;
     user.lastSupport = new Date();
-});
 
 // Express server for health checks (required for Render)
 app.use(express.static('public'));
