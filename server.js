@@ -139,7 +139,7 @@ function startChat(user1Id, user2Id) {
     };
 
     if (user1.supporter && !user2.supporter) {
-        bot.sendMessage(user1Id, '💬⭐ Connected to supporter, tap /end to end the chat'', buttons);
+        bot.sendMessage(user1Id, '💬⭐ Connected to supporter, tap /end to end the chat', buttons);
         bot.sendMessage(user2Id, connectMessage, buttons);
         return;
     } else if (user2.supporter && !user1.supporter) {
