@@ -835,7 +835,7 @@ bot.on('successful_payment', (msg) => {
 
     const purchasedProduct = Object.values(products)
         .find(p => p.payload === payment.invoice_payload);
-    const productName = purchasedProduct ? purchasedProduct.title : 'товар';
+    const productName = purchasedProduct ? purchasedProduct.title : 'product';
     const amount = payment.total_amount;
     const telegramPaymentChargeId = payment.telegram_payment_charge_id;
 
@@ -844,7 +844,7 @@ bot.on('successful_payment', (msg) => {
         `✅ Payment completed successfully!\n` +
         `amount: ${productName}\n` +
         `Price: ${amount} ⭐\n` +
-        `ID транзакции: ${telegramPaymentChargeId}`
+        `ID transactions: ${telegramPaymentChargeId}`
     );
 
     // Update user
