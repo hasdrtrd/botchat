@@ -762,14 +762,13 @@ bot.on('message', (msg) => {
     }
 });
 
-// Handle all callback queries (inline button clicks)
+// Handle callback queries (inline button clicks)
 bot.on('callback_query', (query) => {
     const userId = query.from.id;
     const data = query.data;
     const chatId = query.message.chat.id;
 
-    // Always answer callback to remove loading state
-    bot.answerCallbackQuery(query.id);
+    bot.answerCallbackQuery(query.id); // always answer
 
     // --- Safe Mode toggle ---
     if (data === 'toggle_safe_mode') {
@@ -777,25 +776,19 @@ bot.on('callback_query', (query) => {
         user.safeMode = !user.safeMode;
 
         const status = user.safeMode ? 'ON' : 'OFF';
-
-        const options = {
+        bot.editMessageText(`🔒 Safe Mode is now ${status}`, {
+            chat_id: chatId,
+            message_id: query.message.message_id,
             reply_markup: {
                 inline_keyboard: [
                     [{ text: `Safe Mode: ${status}`, callback_data: 'toggle_safe_mode' }]
                 ]
             }
-        };
-
-        bot.editMessageText(`🔒 Safe Mode is now ${status}`, {
-            chat_id: chatId,
-            message_id: query.message.message_id,
-            reply_markup: options.reply_markup
         });
-
-        return; // stop here so it doesn’t also check buy_*
+        return;
     }
 
-    // --- Handle product purchases ---
+    // --- Product purchases ---
     if (data.startsWith('buy_')) {
         const productKey = data.replace('buy_', '');
         const product = products[productKey];
@@ -803,7 +796,7 @@ bot.on('callback_query', (query) => {
         if (product) {
             const prices = [{
                 label: product.title,
-                amount: product.price * 100 // Stars use smallest units
+                amount: product.price * 100 // Stars in smallest units
             }];
 
             bot.sendInvoice(
@@ -811,8 +804,8 @@ bot.on('callback_query', (query) => {
                 product.title,
                 product.description,
                 product.payload,
-                '', // provider_token (empty for Stars)
-                'XTR', // Telegram Stars
+                '', // provider_token empty for Stars
+                'XTR',
                 prices,
                 { start_parameter: 'start_parameter' }
             );
@@ -840,24 +833,21 @@ bot.on('successful_payment', (msg) => {
     const userId = msg.from.id;
     const username = msg.from.username || "Unknown";
 
-    // Find which product was purchased
-    const purchasedProduct = Object.values(products).find(
-        p => p.payload === payment.invoice_payload
-    );
+    const purchasedProduct = Object.values(products)
+        .find(p => p.payload === payment.invoice_payload);
     const productName = purchasedProduct ? purchasedProduct.title : 'товар';
     const amount = payment.total_amount;
     const telegramPaymentChargeId = payment.telegram_payment_charge_id;
 
-    // Confirm to user
-    bot.sendMessage(
-        chatId,
+    // Confirm to the user
+    bot.sendMessage(chatId,
         `✅ Платеж успешно выполнен!\n` +
         `Товар: ${productName}\n` +
         `Цена: ${amount} ⭐\n` +
         `ID транзакции: ${telegramPaymentChargeId}`
     );
 
-    // Mark user as supporter
+    // Update user
     const user = getUser(userId);
     user.supporter = true;
     user.supportAmount += amount;
@@ -865,19 +855,15 @@ bot.on('successful_payment', (msg) => {
 
     // Notify admins
     ADMIN_IDS.forEach(adminId => {
-        try {
-            bot.sendMessage(
-                adminId,
-                `💰 Payment Received!\n\n` +
-                `👤 User: @${username} (ID: ${userId})\n` +
-                `📦 Product: ${productName}\n` +
-                `💵 Amount: ${amount} ⭐\n` +
-                `🆔 Transaction ID: ${telegramPaymentChargeId}\n` +
-                `⏰ Time: ${new Date().toLocaleString()}`
-            );
-        } catch (err) {
-            console.error(`Failed to notify admin ${adminId}:`, err);
-        }
+        bot.sendMessage(
+            adminId,
+            `💰 Payment Received!\n\n` +
+            `👤 User: @${username} (ID: ${userId})\n` +
+            `📦 Product: ${productName}\n` +
+            `💵 Amount: ${amount} ⭐\n` +
+            `🆔 Transaction ID: ${telegramPaymentChargeId}\n` +
+            `⏰ Time: ${new Date().toLocaleString()}`
+        ).catch(err => console.error(`Failed to notify admin ${adminId}:`, err));
     });
 });
     
