@@ -157,10 +157,10 @@ bot.onText(/\/start/, (msg) => {
     
     const user = getUser(userId); // Initialize user
     
-    let welcomeMessage = `👋 Welcome to StrangerTalk Bot!
+    let welcomeMessage = ` Welcome to Randombuddybot!
 Stay anonymous, safe & have fun.
 
-👉 Tap /chat to find a stranger to talk with!`;
+ Tap /chat to find a stranger to talk with!`;
 
     // Add supporter welcome message
     if (user.supporter && user.supportAmount > 0) {
@@ -210,9 +210,9 @@ bot.onText(/\/chat/, (msg) => {
     } else {
         // Different waiting messages for supporters vs regular users
         if (user.supporter && user.supportAmount > 0) {
-            bot.sendMessage(chatId, '🔍⭐ Looking for a partner... Supporters get priority matching!');
+            bot.sendMessage(chatId, '🔍⭐ Looking for a partner... ');
         } else {
-            bot.sendMessage(chatId, '🔍 Looking for a partner... Please wait!\n\n💡 Tip: Supporters get faster matching with /support');
+            bot.sendMessage(chatId, '🔍 Looking for a partner... ');
         }
     }
 });
