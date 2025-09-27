@@ -789,7 +789,7 @@ bot.on('callback_query', (query) => {
     bot.answerCallbackQuery(query.id); // always answer
 
     // --- Handle /buy button click ---
-    if (data === '/buy') {
+    if (data === 'buy_command') {
         // Trigger the same logic as /buy command
         const keyboard = {
             inline_keyboard: [
