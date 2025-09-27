@@ -115,29 +115,42 @@ function startChat(user1Id, user2Id) {
     activeChats.set(user2Id, user1Id);
     waitingQueue.delete(user1Id);
     waitingQueue.delete(user2Id);
-    
-    // Check if both are supporters for special message
+
     const user1 = getUser(user1Id);
     const user2 = getUser(user2Id);
     const bothSupporters = user1.supporter && user2.supporter;
-    
+
     let connectMessage = '💬 Connected! You can now chat anonymously. Use /stop to end chat.';
-    
+
     if (bothSupporters) {
         connectMessage = '💬✨ Connected with fellow supporter! You can now chat anonymously. Use /stop to end chat.\n\n🌟 Thank you both for supporting our bot!';
-    } else if (user1.supporter) {
-        bot.sendMessage(user1Id, '💬⭐ Connected! As a supporter, you get priority matching. Chat away!');
-        bot.sendMessage(user2Id, connectMessage);
+    }
+
+    // Forward + Buy buttons (only at match time)
+    const buttons = {
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    { text: "📤 Forward →", switch_inline_query: "" },
+                    { text: "🛒 Buy", callback_data: "buy" }
+                ]
+            ]
+        }
+    };
+
+    if (user1.supporter && !user2.supporter) {
+        bot.sendMessage(user1Id, '💬⭐ Connected! As a supporter, you get priority matching. Chat away!', buttons);
+        bot.sendMessage(user2Id, connectMessage, buttons);
         return;
-    } else if (user2.supporter) {
-        bot.sendMessage(user2Id, '💬⭐ Connected! As a supporter, you get priority matching. Chat away!');
-        bot.sendMessage(user1Id, connectMessage);
+    } else if (user2.supporter && !user1.supporter) {
+        bot.sendMessage(user2Id, '💬⭐ Connected! As a supporter, you get priority matching. Chat away!', buttons);
+        bot.sendMessage(user1Id, connectMessage, buttons);
         return;
     }
-    
-    // Send same message to both if both supporters or both regular users
-    bot.sendMessage(user1Id, connectMessage);
-    bot.sendMessage(user2Id, connectMessage);
+
+    // Both supporters or both regular users
+    bot.sendMessage(user1Id, connectMessage, buttons);
+    bot.sendMessage(user2Id, connectMessage, buttons);
 }
 
 function endChat(userId) {
@@ -145,6 +158,11 @@ function endChat(userId) {
     if (partnerId) {
         activeChats.delete(userId);
         activeChats.delete(partnerId);
+
+        // No buttons on disconnect messages
+        bot.sendMessage(userId, "❌ You have left the chat.");
+        bot.sendMessage(partnerId, "❌ Your partner has left the chat. Type /search to find a new one.");
+
         return partnerId;
     }
     return null;
