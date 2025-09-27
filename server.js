@@ -257,24 +257,24 @@ const products = {
 };
 
 // Buy command with product selection
-bot.onText(/\/buy/, (msg) => {
+bot.onText(/\/support/, (msg) => {
     const chatId = msg.chat.id;
 
     const keyboard = {
         inline_keyboard: [
             [
-                { text: `⭐ ${products.basic.title} - ${products.basic.price} звезд`, callback_data: 'buy_basic' }
+                { text: `⭐ ${products.basic.title} - ${products.basic.price} stars`, callback_data: 'buy_basic' }
             ],
             [
-                { text: `⭐ ${products.premium.title} - ${products.premium.price} звезд`, callback_data: 'buy_premium' }
+                { text: `⭐ ${products.premium.title} - ${products.premium.price} stars`, callback_data: 'buy_premium' }
             ],
             [
-                { text: `⭐ ${products.vip.title} - ${products.vip.price} звезд`, callback_data: 'buy_vip' }
+                { text: `⭐ ${products.vip.title} - ${products.vip.price} stars`, callback_data: 'buy_vip' }
             ]
         ]
     };
 
-    bot.sendMessage(chatId, 'Выберите товар для покупки:', {
+    bot.sendMessage(chatId, 'select a amount to donate:', {
         reply_markup: keyboard
     });
     
@@ -298,7 +298,7 @@ Want to support more? Use /support`;
     bot.sendMessage(chatId, statusMessage);
 });
 
-bot.onText(/\/support/, (msg) => {
+//bot.onText(/\/support/, (msg) => {
     const chatId = msg.chat.id;
     
     const supportMessage = `💝 Support Our Bot!
@@ -796,7 +796,7 @@ bot.on('callback_query', (query) => {
         if (product) {
             const prices = [{
                 label: product.title,
-                amount: product.price * 100 // Stars in smallest units
+                amount: product.price * 1 // Stars in smallest units
             }];
 
             bot.sendInvoice(
@@ -819,7 +819,7 @@ bot.on('pre_checkout_query', (query) => {
 
     if (!validPayloads.includes(query.invoice_payload)) {
         bot.answerPreCheckoutQuery(query.id, false, {
-            error_message: 'Что-то пошло не так...'
+            error_message: 'Something went wrong...'
         });
     } else {
         bot.answerPreCheckoutQuery(query.id, true);
@@ -841,9 +841,9 @@ bot.on('successful_payment', (msg) => {
 
     // Confirm to the user
     bot.sendMessage(chatId,
-        `✅ Платеж успешно выполнен!\n` +
-        `Товар: ${productName}\n` +
-        `Цена: ${amount} ⭐\n` +
+        `✅ Payment completed successfully!\n` +
+        `amount: ${productName}\n` +
+        `Price: ${amount} ⭐\n` +
         `ID транзакции: ${telegramPaymentChargeId}`
     );
 
