@@ -866,12 +866,6 @@ bot.on('successful_payment', (msg) => {
         ).catch(err => console.error(`Failed to notify admin ${adminId}:`, err));
     });
 });
-    
-    // Optional: Grant premium features or special status
-    const user = getUser(userId);
-    user.supporter = true;
-    user.supportAmount = (user.supportAmount || 0) + amount;
-    user.lastSupport = new Date();
 
 // Express server for health checks (required for Render)
 app.use(express.static('public'));
