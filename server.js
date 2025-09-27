@@ -132,7 +132,7 @@ function startChat(user1Id, user2Id) {
             inline_keyboard: [
                 [
                     { text: "📤 Forward to friends", switch_inline_query: "" },
-                    { text: "🛒 Buy some food", callback_data: "/buy" }
+                    { text: "🛒 Buy some food", callback_data: "buy_command" }
                 ]
             ]
         }
@@ -829,6 +829,12 @@ bot.on('callback_query', (query) => {
             );
         }
     }
+    // --- Trigger /buy command manually ---
+if (data === "buy_command") {
+    bot.answerCallbackQuery(query.id);
+    // simulate the user typing /buy
+    bot.emit('text', { chat: { id: chatId }, text: '/buy' });
+}
 });
 
 // Pre-checkout query handler
