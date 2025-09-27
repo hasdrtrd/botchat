@@ -277,7 +277,6 @@ bot.onText(/\/buy/, (msg) => {
     bot.sendMessage(chatId, 'Выберите товар для покупки:', {
         reply_markup: keyboard
     });
-});
     
     // Show supporter status
     const supportDate = new Date(user.lastSupport).toLocaleDateString();
