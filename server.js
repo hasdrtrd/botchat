@@ -131,8 +131,8 @@ function startChat(user1Id, user2Id) {
         reply_markup: {
             inline_keyboard: [
                 [
-                    { text: "📤 Forward →", switch_inline_query: "" },
-                    { text: "🛒 Buy", callback_data: "buy" }
+                    { text: "📤 Forward to friends", switch_inline_query: "" },
+                    { text: "🛒 Buy some food", callback_data: "/buy" }
                 ]
             ]
         }
