@@ -179,10 +179,8 @@ async function startRegistration(chatId, userId) {
         };
 
         bot.sendMessage(chatId, 
-            `👋 Welcome!\n\n` +
-            `⚠️ To use this bot, you must:\n` +
-            `1️⃣ Join our Channel\n` +
-            `2️⃣ Join our Group\n\n` +
+            `Welcome!\n\n` +
+            `To use this bot, please join below channel:\n` +
             `After joining both, click "✅ I Joined Both"`,
             { reply_markup: keyboard }
         );
@@ -207,7 +205,7 @@ async function askGender(chatId, userId) {
     };
 
     await bot.sendMessage(chatId, 
-        `🎭 Please select your gender:\n\n` +
+        ` Please select your gender:\n\n` +
         `⚠️ Note: Gender cannot be changed later!`,
         { reply_markup: keyboard }
     );
