@@ -1092,7 +1092,7 @@ bot.on('callback_query', async (query) => {
             }
         }
 
-        bot.sendMessage(chatId, '✅ Report submitted. Thank you for keeping our community safe!');
+        bot.sendMessage(chatId, '✅ Report submitted. Please take a screenshot of chat and send it to @BuddyInboxBot with reason.');
 
         // Notify admins
         ADMIN_IDS.forEach(adminId => {
