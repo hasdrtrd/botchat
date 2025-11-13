@@ -326,13 +326,13 @@ async function startChat(user1Id, user2Id) {
     const user2 = await getUser(user2Id);
 
     const connectMessage = '💬 Connected! Use /end to end chat.\n\n' +
-        '🎁 Send a Telegram Gift to get usernames!;
+        '♦️Tap Get ID to get usernames!';
 
     const buttons = {
         reply_markup: {
             inline_keyboard: [
                 [
-                    { text: "🎁 Send Gift", callback_data: "send_gift" },
+                    { text: "Get ID", callback_data: "send_gift" },
                     { text: "🚫 Report", callback_data: "report_partner" }
                 ],
                 [
@@ -1024,7 +1024,7 @@ bot.on('callback_query', async (query) => {
 
         bot.sendInvoice(
             chatId,
-            '🎁 Reveal Partner Identity',
+            '♦️ Reveal Partner Identity',
             'Pay 300 stars to reveal your partner\'s Telegram username and ID. Both of you will see each other\'s information.',
             `reveal_identity_${partnerId}`,
             '',
