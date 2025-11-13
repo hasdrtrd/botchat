@@ -85,7 +85,7 @@ const stats = {
 
 // Bad words filter
 const badWords = ['spam', 'scam', 'porn', 'xxx', 'sex', 'nude', 'drugs', 'fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'nigger', 'faggot'];
-const badNicknames = ['admin', 'bot', 'official', 'telegram', 'support', ...badWords];
+const badNicknames = ['admin', 'bot', 'official', 'telegram', 'cunt', 'sex', 'dick', 'cock', 'pussy', 'porn', 'bitch', 'boobs', 'tits', 'fucker', 'milf','chut', 'asshole', 'motherfucker', 'kontol', 'mmk', 'memek', 'nnn', 'tt', 'titid', 'support', ...badWords];
 
 function containsBadWords(text) {
     if (!text) return false;
@@ -179,7 +179,7 @@ async function startRegistration(chatId, userId) {
         };
 
         bot.sendMessage(chatId, 
-            `👋 Welcome to RandomBuddyBot!\n\n` +
+            `👋 Welcome!\n\n` +
             `⚠️ To use this bot, you must:\n` +
             `1️⃣ Join our Channel\n` +
             `2️⃣ Join our Group\n\n` +
@@ -327,9 +327,8 @@ async function startChat(user1Id, user2Id) {
     const user1 = await getUser(user1Id);
     const user2 = await getUser(user2Id);
 
-    const connectMessage = '💬 Connected! You can now chat anonymously.\n\n' +
-        '🎁 Send a Telegram Gift to reveal usernames!\n' +
-        '📤 Use /stop to end chat';
+    const connectMessage = '💬 Connected! Use /end to end chat.\n\n' +
+        '🎁 Send a Telegram Gift to get usernames!;
 
     const buttons = {
         reply_markup: {
@@ -401,9 +400,9 @@ bot.onText(/\/start/, async (msg) => {
     // Existing user
     const isPremium = await checkPremiumStatus(user);
     
-    let welcomeMessage = `👋 Welcome back, ${user.nickname}!\n\n` +
-        `🎭 Stay anonymous, safe & have fun.\n\n` +
-        `💬 Tap /chat to find a stranger to talk with!`;
+    let welcomeMessage = `Welcome back, ${user.nickname}!\n\n` +
+        `🌀 Be respectful \n\n` +
+        `💬 Tap /chat to chat!`;
 
     if (isPremium) {
         const daysLeft = Math.ceil((user.premiumExpire - new Date()) / (1000 * 60 * 60 * 24));
@@ -489,10 +488,10 @@ bot.onText(/\/stop/, async (msg) => {
     const partnerId = endChat(userId);
     
     if (partnerId) {
-        bot.sendMessage(chatId, '✅ Chat ended. Use /chat to start a new chat');
-        bot.sendMessage(partnerId, '👋 Your partner left the chat. Use /chat to find a new partner');
+        bot.sendMessage(chatId, 'Chat ended. Use /chat to chat');
+        bot.sendMessage(partnerId, ' Your partner left the chat. Use /chat to chat');
     } else {
-        bot.sendMessage(chatId, '❌ You are not in a chat currently. Use /chat to start.');
+        bot.sendMessage(chatId, ' You are not in a chat currently. Use /chat to start.');
     }
     
     waitingQueue.delete(userId);
@@ -1022,13 +1021,13 @@ bot.on('callback_query', async (query) => {
         // Send invoice for revealing partner identity
         const prices = [{
             label: 'Reveal Partner Identity',
-            amount: 10 // 10 stars
+            amount: 300 // 10 stars
         }];
 
         bot.sendInvoice(
             chatId,
             '🎁 Reveal Partner Identity',
-            'Pay 10 stars to reveal your partner\'s Telegram username and ID. Both of you will see each other\'s information.',
+            'Pay 300 stars to reveal your partner\'s Telegram username and ID. Both of you will see each other\'s information.',
             `reveal_identity_${partnerId}`,
             '',
             'XTR',
@@ -1183,8 +1182,8 @@ bot.on('callback_query', async (query) => {
         const keyboard = {
             inline_keyboard: [
                 [{ text: '⭐ 1 Day - 10 Stars', callback_data: 'buy_premium_1' }],
-                [{ text: '⭐⭐ 7 Days - 30 Stars', callback_data: 'buy_premium_7' }],
-                [{ text: '⭐⭐⭐ 30 Days - 50 Stars', callback_data: 'buy_premium_30' }]
+                [{ text: '⭐ 7 Days - 30 Stars', callback_data: 'buy_premium_7' }],
+                [{ text: '⭐ 30 Days - 50 Stars', callback_data: 'buy_premium_30' }]
             ]
         };
 
@@ -1445,7 +1444,7 @@ bot.on('message', async (msg) => {
                     `✅ Registration Complete!\n\n` +
                     `🏷️ Nickname: ${nickname}\n` +
                     `🎭 Gender: ${gender === 'male' ? '👨 Male' : '👩 Female'}\n\n` +
-                    `💬 Use /chat to start chatting!\n` +
+                    `💬 Use /chat to chat\n` +
                     `⭐ Use /premium to get gender selection!`
                 );
             } else {
